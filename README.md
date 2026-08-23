@@ -3,13 +3,19 @@
 <div align="center">
   <p><b>India's Full-Stack Precision Agriculture & Tamper-Proof Agritech Platform</b></p>
   <p><i>Google Earth Engine • Custom Autonomous Drones • Edge-AI Vision Transformers • Python Cryptographic Blockchain • Parametric Insurance & Carbon Monetization</i></p>
+  
+  <p>
+    <a href="https://vriddhi2-0.onrender.com/" target="_blank">
+      <img src="https://img.shields.io/badge/🚀_Explore_Live_App-Click_Here-brightgreen?style=for-the-badge" alt="Live Demo">
+    </a>
+  </p>
 </div>
 
 ---
 
 ## 🚀 Overview
 
-**Vriddhi 2.0** is an end-to-end agricultural technology platform designed to bridge the gap between smallholder farming and high-value climate finance. By integrating satellite telemetry, custom-built autonomous hardware, local edge-artificial intelligence, and a lightweight tamper-proof cryptographic ledger, Vriddhi 2.0 automates farm monitoring, precise micro-interventions, and verifiable environmental reporting.
+**Vriddhi 2.0** is an end-to-end agricultural technology platform designed to bridge the gap between smallholder farming and high-value climate finance. **[Access the Live Platform Here](https://vriddhi2-0.onrender.com/)** to test the interactive dashboard, map telemetry, and verification flows. By integrating satellite telemetry, custom-built autonomous hardware, local edge-artificial intelligence, and a lightweight tamper-proof cryptographic ledger, Vriddhi 2.0 automates farm monitoring, precise micro-interventions, and verifiable environmental reporting.
 
 ---
 
