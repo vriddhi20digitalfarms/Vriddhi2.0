@@ -2,7 +2,7 @@
 
 <div align="center">
   <p><b>India's Full-Stack Precision Agriculture & Tamper-Proof Agritech Platform</b></p>
-  <p><i>Google Earth Engine • Autonomous Drones • Edge-AI Vision Transformers • Python Cryptographic Blockchain • Parametric Insurance & Carbon Monetization</i></p>
+  <p><i>Google Earth Engine • Custom Autonomous Drones • Edge-AI Vision Transformers • Python Cryptographic Blockchain • Parametric Insurance & Carbon Monetization</i></p>
 </div>
 
 ---
@@ -25,6 +25,17 @@
    Instead of blanket-spraying chemicals across the entire field, the system isolates exact GPS coordinates of detected anomalies, reducing agrochemical usage by up to 40%.
 5. **Cryptographic Blockchain Logging:**
    Every intervention (farmer name, anomaly GPS coordinates, timestamp, and precision-spray execution method) is securely bundled and locked into a local SHA-256 cryptographic blockchain ledger (`blockchain_ledger.json`).
+
+---
+
+## 🚁 Custom Flight Controller & Cost-Disruptive Hardware
+
+To make precision agriculture economically viable for smallholder farmers, we engineered a custom, low-cost flight controller and edge-computing stack that drastically undercuts commercial alternatives:
+
+* **Hardware Component Breakdown:** Built using a **Raspberry Pi Zero 2W** (edge computing/controller), **ESP32** (telemetry/communication), **BMP280** (barometric altitude sensor), **NEO-6M** (GPS module), **MPU 6050** (6-axis accelerometer/gyroscope), and **HMC5883L** (digital compass).
+* **Cost Efficiency:** The entire custom hardware stack costs approximately **₹3,999**, making it **93.75% cheaper** than commercial industrial flight controllers like the *Pixhawk Cube Orange* (which retail around ₹64,000).
+* **Hardware-in-the-Loop Dashboard Dependency:** 
+  > *Note on Live Telemetry:* The anomaly status and crop health metrics displayed on the web dashboard update dynamically based on physical execution. If the dashboard is not actively connected to the drone's Raspberry Pi executing the field scan, the dashboard state remains static. Real-time updates and blockchain records are exclusively triggered when the physical hardware completes its mission and syncs its telemetry back to the backend.
 
 ---
 
@@ -70,6 +81,7 @@ To maintain institutional-grade trust for carbon buyers and insurance underwrite
 
 * **Backend & Web:** Python, Flask, Gunicorn, Requests
 * **Remote Sensing:** Google Earth Engine API, Sentinel-2 (NDVI, NDWI, NDMI indices)
+* **Custom Flight Hardware:** Raspberry Pi Zero 2W, ESP32, MPU 6050, HMC5883L, BMP280, NEO-6M GPS
 * **Edge Computing & AI:** PyTorch, Torchvision, TIMM (Vision Transformers), PIL, OpenCV
-* **Hardware & Telemetry:** Raspberry Pi, Python Serial, UART (`/dev/ttyAMA0`), libcamera/rpicam
+* **Hardware Telemetry:** Python Serial, UART (`/dev/ttyAMA0`), libcamera/rpicam
 * **Security & Ledger:** SHA-256 Cryptographic Hashing, Local JSON State Architecture
