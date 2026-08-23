@@ -13,13 +13,13 @@
 
 ---
 
-##  Overview
+## 🚀 Overview
 
 **Vriddhi 2.0** is an end-to-end agricultural technology platform designed to bridge the gap between smallholder farming and high-value climate finance. **[Access the Live Platform Here](https://vriddhi2-0.onrender.com/)** to test the interactive dashboard, map telemetry, and verification flows. By integrating satellite telemetry, custom-built autonomous hardware, local edge-artificial intelligence, and a lightweight tamper-proof cryptographic ledger, Vriddhi 2.0 automates farm monitoring, precise micro-interventions, and verifiable environmental reporting.
 
 ---
 
-##  How It Works: The Workflow Architecture
+## ⚙️ How It Works: The Workflow Architecture
 
 1. **Field Selection & Satellite Telemetry (Landing & Map Pages):**
    Farmers select their field area of interest on an interactive web map. These coordinates interface directly with **Google Earth Engine (GEE)** to extract multi-spectral Sentinel-2 data, instantly computing baseline environmental indices like **NDVI** (vegetation health/greenness), **NDWI** (surface water content), and **NDMI** (moisture stress).
@@ -34,7 +34,7 @@
 
 ---
 
-##  Custom Flight Controller, Hardware & Hybrid Data Fusion
+## 🚁 Custom Flight Controller, Hardware & Hybrid Data Fusion
 
 To make precision agriculture economically viable for smallholder farmers, we engineered a custom, low-cost flight controller and edge-computing stack that drastically undercuts commercial alternatives:
 
@@ -45,7 +45,7 @@ To make precision agriculture economically viable for smallholder farmers, we en
 
 ---
 
-##  In-House Artificial Intelligence & Training Performance
+## 🤖 In-House Artificial Intelligence & Training Performance
 
 Vriddhi 2.0 leverages a hybrid AI pipeline combining edge computing with cloud intelligence:
 
@@ -61,7 +61,7 @@ Vriddhi 2.0 leverages a hybrid AI pipeline combining edge computing with cloud i
 
 ---
 
-##  Tamper-Proof Ledger (The Blockchain Layer)
+## 🛡️ Tamper-Proof Ledger (The Blockchain Layer)
 
 To maintain institutional-grade trust for carbon buyers and insurance underwriters without incurring exorbitant gas fees or network bloat, Vriddhi 2.0 implements a **lightweight, native Python cryptographic blockchain**:
 
@@ -71,7 +71,7 @@ To maintain institutional-grade trust for carbon buyers and insurance underwrite
 
 ---
 
-##  Monetization, Carbon Credits & Insurance Integration
+## 💰 Monetization, Carbon Credits & Insurance Integration
 
 ### 1. Carbon Credits & Data Monetization
 * **The Reality:** Precision spot-spraying drastically reduces chemical manufacturing footprints, tractor fuel emissions, and toxic runoff (Scope 3 supply chain emissions).
@@ -83,7 +83,7 @@ To maintain institutional-grade trust for carbon buyers and insurance underwrite
 
 ---
 
-##  Technology Stack
+## 🛠️ Technology Stack
 
 * **Backend & Web:** Python, Flask, Gunicorn, Requests
 * **Remote Sensing:** Google Earth Engine API, Sentinel-2 (NDVI, NDWI, NDMI indices)
