@@ -20,7 +20,6 @@ from reportlab.lib import colors
 load_dotenv()
 
 print("====================================================")
-print("🚀 CACHE BREAKER v2.0: RUNNING BRUTE FORCE CODE ENGINE!!")
 print("====================================================")
 
 app = Flask(__name__, template_folder='.', static_folder='.', static_url_path='')
