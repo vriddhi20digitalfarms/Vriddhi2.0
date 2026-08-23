@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vriddhi 2.0 - Field Matrix Scanner</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #f3f4f6;
+            --panel-bg: #ffffff;
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --dark-slate: #1f2937;
+            --text-muted: #6b7280;
+            --gold: #f59e0b;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--dark-slate);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Modern Responsive Navbar */
+        .navbar {
+            background-color: var(--panel-bg);
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            z-index: 1000;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--dark-slate);
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            padding: 0.4rem 0.8rem;
+            border-radius: 9999px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand i {
+            font-size: 1.75rem;
+            color: var(--primary);
+        }
+
+        .brand-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .brand-text span {
+            color: var(--primary);
+        }
+
+        /* Gamified Credit Counter Widget */
+        .rewards-widget {
+            display: flex;
+            align-items: center;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #d97706;
+            transition: transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .rewards-widget:hover {
+            transform: scale(1.03);
+        }
+
+        .rewards-widget i {
+            color: var(--gold);
+            animation: coin-pulse 2s infinite alternate;
+        }
+
+        /* Dynamic Main Dashboard Container away from walls */
+        .dashboard-container {
+            flex: 1;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+            height: calc(100vh - 70px);
+            min-height: 0;
+            overflow-y: auto;
+            /* Prevents flex items from breaking layout overflow constraints */
+        }
+
+        .map-wrapper {
+            flex: 1;
+            background: var(--panel-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid rgba(229, 231, 235, 1);
+            position: relative;
+            min-height: 480px;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Clean Bottom Action Bar */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--panel-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(229, 231, 235, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            gap: 1rem;
+            box-sizing: border-box;
+        }
+
+        .info-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.75rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        @keyframes coin-pulse {
+            0% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 0 rgba(245, 158, 11, 0));
+            }
+
+            100% {
+                transform: scale(1.15);
+                filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.5));
+            }
+        }
+
+        /* Responsive Breakpoints Matrix */
+        @media (max-width: 768px) {
+            body {
+                overflow: auto;
+                /* Allow natural scrolling on small touchscreens if required */
+                height: auto;
+            }
+
+            .navbar {
+                padding: 0.75rem 1rem;
+                flex-direction: column;
+                gap: 0.75rem;
+                height: auto;
+                align-items: center;
+                text-align: center;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+                margin-top: 0.25rem;
+            }
+
+            .nav-link {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .dashboard-container {
+                padding: 1rem;
+                height: auto;
+                min-height: calc(100vh - 120px);
+            }
+
+            .map-wrapper {
+                height: 450px;
+                min-height: auto;
+                /* Locked explicit layout altitude block for mobile views */
+                flex: none;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                padding: 1.25rem 1rem;
+            }
+
+            .info-text {
+                flex-direction: column;
+                gap: 0.25rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .btn {
+                justify-content: center;
+                width: 100%;
+                padding: 0.85rem;
+            }
+
+            .action-group {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                gap: 0.5rem;
+            }
+
+            .search-container {
+                width: 100%;
+                display: flex;
+            }
+
+            .search-input {
+                flex: 1;
+                min-width: 0;
+                width: 100%;
+            }
+
+            .search-btn {
+                justify-content: center;
+            }
+        }
+
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-input {
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            border: 1px solid rgba(229, 231, 235, 1);
+            border-radius: 8px;
+            outline: none;
+            width: 220px;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+        }
+
+        .search-btn {
+            background: var(--dark-slate);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(31, 41, 55, 0.1);
+            white-space: nowrap;
+        }
+
+        .search-btn:hover {
+            background: #111827;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="brand">
+            <img src="logo.png" alt="Vriddhi Logo"
+                style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 8px; border: 1px solid rgba(229, 231, 235, 1); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);" />
+            <div class="brand-text">Vriddhi <span>2.0</span></div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/dashboard" class="nav-link active">Dashboard</a>
+            <a href="/marketplace" class="nav-link">Marketplace</a>
+            <a href="/insurance-claim" class="nav-link">Insurance Claim</a>
+        </div>
+
+        <div class="rewards-widget" id="credit-display">
+            <i class="fa-solid fa-coins"></i>
+            <span id="credit-count">100</span> Remediation Credits
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="map-wrapper">
+            <div id="map"></div>
+        </div>
+
+        <div class="action-bar">
+            <div class="info-text">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Draw a bounding polygon over target crop grids to initialize spatial telemetry tracking.</span>
+            </div>
+            <div class="action-group">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search location..." class="search-input" />
+                    <button id="search-btn" class="search-btn">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        Search
+                    </button>
+                </div>
+                <button id="launch-btn" class="btn">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                    Launch Field Analysis
+                </button>
+            </div>
+        </div>
+        <!-- New Dedicated Drone Analysis Panel (Appears dynamically below action-bar) -->
+        <div id="drone-report-card"
+            style="display: none; background: var(--panel-bg); border-radius: 12px; border: 1px solid rgba(229, 231, 235, 1); padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-top: 1rem;">
+            <div
+                style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                <div
+                    style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.1rem; color: var(--dark-slate);">
+                    <i class="fa-solid fa-drone" style="color: var(--primary);"></i>
+                    Vriddhi Drone Telemetry & AI Diagnosis Report
+                </div>
+                <span id="report-timestamp" style="font-size: 0.8rem; color: var(--text-muted);">--</span>
+            </div>
+
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div
+                        style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+                        Detected Illness / Anomaly</div>
+                    <div id="report-illness" style="font-size: 1.1rem; font-weight: 700; color: #b91c1c;">Scanning...
+                    </div>
+                </div>
+
+                <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div
+                        style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+                        AI Confidence Score</div>
+                    <div id="report-confidence" style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">--
+                    </div>
+                </div>
+
+                <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div
+                        style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+                        Matrix Scan Accuracy</div>
+                    <div id="report-accuracy" style="font-size: 1.1rem; font-weight: 700; color: var(--dark-slate);">
+                        98.4%</div>
+                </div>
+            </div>
+
+            <div style="background: #ecfdf5; padding: 1rem; border-radius: 8px; border: 1px solid #a7f3d0;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #065f46; margin-bottom: 0.25rem;">
+                    <i class="fa-solid fa-prescription-bottle-medical"></i> Recommended Medicine & Treatment Steps:
+                </div>
+                <div id="report-cure" style="font-size: 0.95rem; color: #047857; line-height: 1.5;">--</div>
+            </div>
+        </div>
+
+        <!-- New Dedicated Spot-Spray Control Panel (Appears dynamically when anomalies detected) -->
+        <div id="spray-control-panel"
+            style="display: none; background: var(--panel-bg); border-radius: 12px; border: 1px solid rgba(229, 231, 235, 1); padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-top: 1rem;">
+            <div
+                style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                <div
+                    style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.1rem; color: var(--dark-slate);">
+                    <i class="fa-solid fa-spray-can-sparkles" style="color: var(--primary);"></i>
+                    Precision Spot-Spray & Blockchain Logger
+                </div>
+                <span id="spray-status-badge" style="font-size: 0.8rem; font-weight: 600; color: #b91c1c; background: #fee2e2; padding: 0.25rem 0.75rem; border-radius: 9999px;">Pending Spray</span>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.75rem;">
+                    Active anomalies detected on your farm. Log a precision spot-spray action to establish a verified record on the blockchain ledger for insurance claim eligibility.
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: center;">
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--dark-slate); margin-bottom: 0.5rem;">Select Spray Method</label>
+                        <select id="spray-method-select" style="width: 100%; padding: 0.6rem; border: 1px solid #e5e7eb; border-radius: 8px; outline: none; background: white; font-size: 0.9rem;">
+                            <option value="Drone Precision Spot-Sprayed">Drone Precision Spot-Sprayed (Recommended)</option>
+                            <option value="Manual Spot-Sprayed">Manual Spot-Sprayed</option>
+                        </select>
+                    </div>
+                    <div style="text-align: right;">
+                        <button id="log-spray-btn" onclick="executeAndLogSpray()" class="btn" style="width: 100%; justify-content: center; height: 42px;">
+                            <i class="fa-solid fa-cube"></i> Log Spot-Spray to Blockchain
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blockchain Receipt Details (Hidden until logged) -->
+            <div id="blockchain-receipt" style="display: none; background: #ecfdf5; padding: 1rem; border-radius: 8px; border: 1px solid #a7f3d0; margin-top: 1rem;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #065f46; margin-bottom: 0.5rem;">
+                    <i class="fa-solid fa-circle-check"></i> Blockchain Spot-Spray Entry Registered Successfully!
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; font-size: 0.8rem; color: #047857;">
+                    <div><b>Block Index:</b> <span id="receipt-index">--</span></div>
+                    <div><b>Spray Method:</b> <span id="receipt-method">--</span></div>
+                    <div><b>GPS Coordinates:</b> <span id="receipt-coords">--</span></div>
+                    <div style="grid-column: span 2; word-break: break-all;"><b>Block Hash:</b> <span id="receipt-hash" style="font-family: monospace; font-weight: bold;">--</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script type="module">
+        // Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Center map over Assam by default, then attempt to locate the user
+        var map = L.map('map', { maxZoom: 21 }).setView([26.1445, 91.7362], 17);
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                map.setView([lat, lng], 17);
+            }, function (error) {
+                console.warn("Geolocation access denied or failed: ", error.message);
+            }, {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            });
+        }
+
+        L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 21,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: 'Map data &copy; Google'
+        }).addTo(map);
+
+        // Fetch user credit tally immediately on website page load
+        fetch('/api/farmer-stats')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('credit-count').innerText = data.credit_points;
+            })
+            .catch(err => console.error("Could not fetch score stats profiles:", err));
+
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        var drawControl = new L.Control.Draw({
+            edit: { featureGroup: drawnItems },
+            draw: { polygon: true, rectangle: true, polyline: false, circle: false, marker: false, circlemarker: false }
+        });
+        map.addControl(drawControl);
+
+        var activeFieldGeoJSON = null;
+        var scannedGeometriesList = [];
+
+        function isGeometryInScannedList(g) {
+            if (!g || scannedGeometriesList.length === 0) return false;
+            var coords = g.geometry ? g.geometry.coordinates : g.coordinates;
+            var coordsStr = JSON.stringify(coords);
+            return scannedGeometriesList.some(function (item) {
+                return JSON.stringify(item) === coordsStr;
+            });
+        }
+
+        map.on(L.Draw.Event.CREATED, function (e) {
+            drawnItems.clearLayers();
+            var layer = e.layer;
+            drawnItems.addLayer(layer);
+            activeFieldGeoJSON = layer.toGeoJSON();
+
+            try {
+                if (typeof L.GeometryUtil !== 'undefined' && typeof L.GeometryUtil.geodesicArea === 'function') {
+                    var latlngs = layer.getLatLngs();
+                    if (Array.isArray(latlngs[0])) {
+                        latlngs = latlngs[0];
+                    }
+                    var areaInSqMeters = L.GeometryUtil.geodesicArea(latlngs);
+                    var areaInHectares = (areaInSqMeters / 10000).toFixed(2);
+                    localStorage.setItem('selected_area_hectares', areaInHectares);
+                }
+
+                if (typeof layer.getBounds === 'function') {
+                    var center = layer.getBounds().getCenter();
+                    var lat = center.lat.toFixed(4);
+                    var lng = center.lng.toFixed(4);
+                    var coordinatesString = lat + "°N, " + lng + "°E";
+                    localStorage.setItem('selected_area_coordinates', coordinatesString);
+                }
+            } catch (err) {
+                console.error("Telemetry tracking error:", err);
+            }
+        });
+
+        document.getElementById('launch-btn').addEventListener('click', function () {
+            if (activeFieldGeoJSON) {
+                if (isGeometryInScannedList(activeFieldGeoJSON)) {
+                    alert("The new data gets updated after 5 days so please check within day 5 to day 10.");
+                    return;
+                }
+
+                const btn = document.getElementById('launch-btn');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing Matrix...`;
+                btn.style.opacity = "0.75";
+                btn.style.pointerEvents = "none";
+
+                fetch('/api/analyze-field', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(activeFieldGeoJSON)
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        btn.innerHTML = originalHTML;
+                        btn.style.opacity = "1";
+                        btn.style.pointerEvents = "auto";
+
+                        if (result.status === "success") {
+                            let displayMsg = result.message;
+                            if (result.cloud_percentage === null || result.cloud_percentage === undefined || result.cloud_percentage > 30) {
+                                let pct = (result.cloud_percentage !== null && result.cloud_percentage !== undefined) ? result.cloud_percentage.toFixed(1) + "%" : "Unknown";
+                                displayMsg += "\n\n⚠️ Accuracy Warning: Selected image has high cloud cover (" + pct + "). Analysis accuracy may be affected.";
+                            }
+                            alert(displayMsg);
+
+                            // Dynamically adjust navbar points tracker using verified database payload values
+                            document.getElementById('credit-count').innerText = result.credit_points;
+
+                            if (result.data.features.length > 0) {
+                                var coords = activeFieldGeoJSON.geometry ? activeFieldGeoJSON.geometry.coordinates : activeFieldGeoJSON.coordinates;
+                                scannedGeometriesList.push(coords);
+
+                                // Display precision spray logging panel
+                                document.getElementById('spray-control-panel').style.display = 'block';
+                                document.getElementById('blockchain-receipt').style.display = 'none';
+                                document.getElementById('spray-status-badge').innerText = "Pending Spray";
+                                document.getElementById('spray-status-badge').style.color = "#b91c1c";
+                                document.getElementById('spray-status-badge').style.background = "#fee2e2";
+
+                                L.geoJSON(result.data, {
+                                    pointToLayer: function (feature, latlng) {
+                                        let severity = feature.properties.severity;
+                                        let fillColor, color;
+                                        if (severity === 'severe') {
+                                            fillColor = '#b91c1c'; // Dark Red
+                                            color = '#991b1b';
+                                        } else if (severity === 'moderate') {
+                                            fillColor = '#f97316'; // Orange
+                                            color = '#c2410c';
+                                        } else {
+                                            fillColor = '#eab308'; // Yellow
+                                            color = '#a16207';
+                                        }
+
+                                        return L.circleMarker(latlng, {
+                                            radius: 6,
+                                            fillColor: fillColor,
+                                            color: color,
+                                            weight: 1.5,
+                                            opacity: 0.9,
+                                            fillOpacity: 0.75
+                                        });
+                                    },
+                                    onEachFeature: function (feature, layer) {
+                                        let props = feature.properties;
+                                        let severityColor = props.severity === 'severe' ? '#b91c1c' : (props.severity === 'moderate' ? '#c2410c' : '#a16207');
+                                        let popupContent = `
+                                            <b>Vriddhi Tea Health Marker</b><br>
+                                            <b>Severity:</b> <span style="color:${severityColor};font-weight:bold;">${props.severity.toUpperCase()}</span><br>
+                                            <b>NDVI:</b> ${props.ndvi_value.toFixed(3)}<br>
+                                            <b>NDMI:</b> ${props.ndmi_value.toFixed(3)}<br>
+                                            <span style="font-size:0.8rem;color:#6b7280;">Location: ${props.lat.toFixed(5)}, ${props.lng.toFixed(5)}</span>
+                                        `;
+                                        layer.bindPopup(popupContent);
+                                    }
+                                }).addTo(map);
+                            }
+                        } else {
+                            alert("Processing Error: " + result.message);
+                        }
+                    })
+                    .catch(error => {
+                        btn.innerHTML = originalHTML;
+                        btn.style.opacity = "1";
+                        btn.style.pointerEvents = "auto";
+                        console.error('Network Error:', error);
+                        alert("Could not establish communication link with analysis engines.");
+                    });
+
+            } else {
+                alert("Please use the polygon toolbar on the map to mark your field boundary first.");
+            }
+        });
+
+        document.getElementById('search-btn').addEventListener('click', function () {
+            var query = document.getElementById('search-input').value.trim();
+            if (!query) {
+                alert("Please enter a location to search.");
+                return;
+            }
+
+            const searchBtn = document.getElementById('search-btn');
+            const originalHTML = searchBtn.innerHTML;
+            searchBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Searching...`;
+            searchBtn.style.pointerEvents = 'none';
+
+            fetch(`/api/geocode?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    searchBtn.innerHTML = originalHTML;
+                    searchBtn.style.pointerEvents = 'auto';
+
+                    if (data && data.length > 0) {
+                        var lat = parseFloat(data[0].lat);
+                        var lon = parseFloat(data[0].lon);
+                        if (data[0].boundingbox && data[0].boundingbox.length === 4) {
+                            var bbox = data[0].boundingbox;
+                            var southWest = L.latLng(parseFloat(bbox[0]), parseFloat(bbox[2]));
+                            var northEast = L.latLng(parseFloat(bbox[1]), parseFloat(bbox[3]));
+                            var bounds = L.latLngBounds(southWest, northEast);
+                            map.fitBounds(bounds, { maxZoom: 18 });
+                        } else {
+                            map.setView([lat, lon], 17);
+                        }
+                    } else {
+                        alert("Location not found. Please try a different query.");
+                    }
+                })
+                .catch(err => {
+                    console.error("Geocoding error:", err);
+                    searchBtn.innerHTML = originalHTML;
+                    searchBtn.style.pointerEvents = 'auto';
+                    alert("Could not connect to the search service.");
+                });
+        });
+
+        document.getElementById('search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById('search-btn').click();
+            }
+        });
+        // Firebase Config & Initialization (SDK imports are at the top of this module script)
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCh26GRzJyvkD32-r8HeJQ7EtI3LfzcLJ8",
+            authDomain: "vriddhi2-fda2c.firebaseapp.com",
+            databaseURL: "https://vriddhi2-fda2c-default-rtdb.firebaseio.com",
+            projectId: "vriddhi2-fda2c",
+            storageBucket: "vriddhi2-fda2c.firebasestorage.app",
+            messagingSenderId: "102867739299",
+            appId: "1:102867739299:web:512586e5fe0818ca7a5516",
+            measurementId: "G-CPPE44KTTC"
+        };
+
+        const fbApp = initializeApp(firebaseConfig);
+        const fbDb = getDatabase(fbApp);
+
+        // Listen for new plant diagnosis reports coming from the Raspberry Pi
+        const reportsRef = query(ref(fbDb, 'plant_reports'), limitToLast(1));
+        onChildAdded(reportsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                document.getElementById('drone-report-card').style.display = 'block';
+                document.getElementById('report-illness').innerText = data.anomaly_detected || "Healthy";
+                document.getElementById('report-confidence').innerText = ((data.confidence_score || 0.95) * 100).toFixed(1) + "%";
+                document.getElementById('report-cure').innerText = data.cure_and_treatment || "No treatment required.";
+                document.getElementById('report-timestamp').innerText = new Date(data.timestamp || Date.now()).toLocaleTimeString();
+
+                // If crop anomaly is detected, show blockchain logging control panel
+                if (data.anomaly_detected && data.anomaly_detected !== "Healthy") {
+                    document.getElementById('spray-control-panel').style.display = 'block';
+                    document.getElementById('blockchain-receipt').style.display = 'none';
+                    document.getElementById('spray-status-badge').innerText = "Pending Spray";
+                    document.getElementById('spray-status-badge').style.color = "#b91c1c";
+                    document.getElementById('spray-status-badge').style.background = "#fee2e2";
+                }
+            }
+        });
+
+        // Updated Launch Button Event Listener
+        document.getElementById('launch-btn').addEventListener('click', function () {
+            if (activeFieldGeoJSON) {
+                if (isGeometryInScannedList(activeFieldGeoJSON)) {
+                    alert("The new data gets updated after 5 days so please check within day 5 to day 10.");
+                    return;
+                }
+
+                const btn = document.getElementById('launch-btn');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Triggering Drone & Matrix...`;
+                btn.style.opacity = "0.75";
+                btn.style.pointerEvents = "none";
+
+                // 1. SIGNAL RASPBERRY PI TO START DRONE MISSION
+                set(ref(fbDb, 'drone_control'), {
+                    status: "START",
+                    timestamp: Date.now()
+                }).then(() => {
+                    console.log("Drone launch signal dispatched to Raspberry Pi!");
+                }).catch(err => console.error("Firebase signal error:", err));
+
+                // 2. RUN EXISTING FIELD ANALYSIS BACKEND API
+                fetch('/api/analyze-field', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(activeFieldGeoJSON)
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        btn.innerHTML = originalHTML;
+                        btn.style.opacity = "1";
+                        btn.style.pointerEvents = "auto";
+
+                        if (result.status === "success") {
+                            let displayMsg = result.message;
+                            if (result.cloud_percentage === null || result.cloud_percentage === undefined || result.cloud_percentage > 30) {
+                                let pct = (result.cloud_percentage !== null && result.cloud_percentage !== undefined) ? result.cloud_percentage.toFixed(1) + "%" : "Unknown";
+                                displayMsg += "\n\n⚠️ Accuracy Warning: Selected image has high cloud cover (" + pct + "). Analysis accuracy may be affected.";
+                            }
+                            alert(displayMsg);
+                            
+                            // Display precision spray logging panel
+                            document.getElementById('spray-control-panel').style.display = 'block';
+                            document.getElementById('blockchain-receipt').style.display = 'none';
+                            document.getElementById('spray-status-badge').innerText = "Pending Spray";
+                            document.getElementById('spray-status-badge').style.color = "#b91c1c";
+                            document.getElementById('spray-status-badge').style.background = "#fee2e2";
+
+                            if (result.data.features.length > 0) {
+                                L.geoJSON(result.data, {
+                                    pointToLayer: function (feature, latlng) {
+                                        let severity = feature.properties.severity;
+                                        let fillColor = severity === 'severe' ? '#b91c1c' : (severity === 'moderate' ? '#f97316' : '#eab308');
+                                        let color = severity === 'severe' ? '#991b1b' : (severity === 'moderate' ? '#c2410c' : '#a16207');
+
+                                        return L.circleMarker(latlng, {
+                                            radius: 6,
+                                            fillColor: fillColor,
+                                            color: color,
+                                            weight: 1.5,
+                                            opacity: 0.9,
+                                            fillOpacity: 0.75
+                                        });
+                                    },
+                                    onEachFeature: function (feature, layer) {
+                                        let props = feature.properties;
+                                        let severityColor = props.severity === 'severe' ? '#b91c1c' : (props.severity === 'moderate' ? '#c2410c' : '#a16207');
+                                        let popupContent = `
+                                            <b>Vriddhi Tea Health Marker</b><br>
+                                            <b>Severity:</b> <span style="color:${severityColor};font-weight:bold;">${props.severity.toUpperCase()}</span><br>
+                                            <b>NDVI:</b> ${props.ndvi_value.toFixed(3)}<br>
+                                            <b>NDMI:</b> ${props.ndmi_value.toFixed(3)}<br>
+                                            <span style="font-size:0.8rem;color:#6b7280;">Location: ${props.lat.toFixed(5)}, ${props.lng.toFixed(5)}</span>
+                                        `;
+                                        layer.bindPopup(popupContent);
+                                    }
+                                }).addTo(map);
+                            }
+                        } else {
+                            alert("Processing Error: " + result.message);
+                        }
+                    })
+                    .catch(error => {
+                        btn.innerHTML = originalHTML;
+                        btn.style.opacity = "1";
+                        btn.style.pointerEvents = "auto";
+                        console.error('Network Error:', error);
+                        alert("Could not establish communication link with analysis engines.");
+                    });
+
+            } else {
+                alert("Please use the polygon toolbar on the map to mark your field boundary first.");
+            }
+        });
+
+        function executeAndLogSpray() {
+            const loggedInUser = JSON.parse(localStorage.getItem('logged_in_user'));
+            const farmerName = loggedInUser ? loggedInUser.name : "anchu";
+            const coordinates = localStorage.getItem('selected_area_coordinates') || "Unknown Location";
+            const sprayMethod = document.getElementById('spray-method-select').value;
+
+            const logBtn = document.getElementById('log-spray-btn');
+            const originalHTML = logBtn.innerHTML;
+            logBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Logging Block...`;
+            logBtn.disabled = true;
+
+            fetch('/api/log-spray', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    farmer_name: farmerName,
+                    coordinates: coordinates,
+                    spray_method: sprayMethod
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                logBtn.innerHTML = originalHTML;
+                logBtn.disabled = false;
+
+                if (data.status === 'success') {
+                    // Update UI details
+                    document.getElementById('spray-status-badge').innerText = "Sprayed & Verified";
+                    document.getElementById('spray-status-badge').style.color = "#065f46";
+                    document.getElementById('spray-status-badge').style.background = "#d1fae5";
+
+                    document.getElementById('receipt-index').innerText = "#" + data.block.index;
+                    document.getElementById('receipt-method').innerText = data.block.spray_method;
+                    document.getElementById('receipt-coords').innerText = data.block.coordinates;
+                    document.getElementById('receipt-hash').innerText = data.block.hash;
+
+                    document.getElementById('blockchain-receipt').style.display = 'block';
+                    alert("Precision spot-spray logged successfully to the blockchain! Block Hash: " + data.block.hash);
+                } else {
+                    alert("Logging failed: " + data.message);
+                }
+            })
+            .catch(err => {
+                logBtn.innerHTML = originalHTML;
+                logBtn.disabled = false;
+                console.error("Blockchain error:", err);
+                alert("Failed to connect to the blockchain logger.");
+            });
+        }
+        window.executeAndLogSpray = executeAndLogSpray;
+    </script>
+</body>
+
+</html>

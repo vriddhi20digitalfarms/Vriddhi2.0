@@ -1,0 +1,9 @@
+Flask
+flask-cors
+pymongo
+dnspython
+earthengine-api
+gunicorn
+certifi
+python-dotenv
+reportlab
