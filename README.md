@@ -26,7 +26,7 @@
 2. **Autonomous Drone Flight & Edge Scanning:**
    Upon receiving a launch signal and target coordinates from the web backend (`app.py`), the Raspberry Pi-powered drone executes a localized flight mission, hovering to capture high-resolution RGB/NIR imagery using onboard cameras.
 3. **Local Edge-AI Processing:**
-   Captured imagery passes through our custom Vision Transformer (ViT) Autoencoder running directly on the edge. The model evaluates reconstruction error to instantly filter pristine foliage from stressed or diseased crops.
+   Captured imagery passes through our custom **Multi model self-supervised reconstruction based anomaly detection system** running directly on. The model evaluates reconstruction error to instantly filter pristine foliage from stressed or diseased crops.
 4. **Precision Spot-Spraying:**
    Instead of blanket-spraying chemicals across the entire field, the system isolates exact GPS coordinates of detected anomalies, reducing agrochemical usage by up to 40%.
 5. **Cryptographic Blockchain Logging:**
@@ -49,7 +49,7 @@ To make precision agriculture economically viable for smallholder farmers, we en
 
 Vriddhi 2.0 leverages a hybrid AI pipeline combining edge computing with cloud intelligence:
 
-* **Local Edge Model (Vision Transformer Autoencoder):**
+* **Local Edge Model: **Multi model self-supervised reconstruction based anomaly detection system****
   * **Dataset & Scale:** Rigorously trained from scratch on a massive dataset of **12,500 healthy plant images**, allowing it to universally recognize pristine foliage across diverse crop species with zero false-positive bias.
   * **Architecture:** Built using a `vit_tiny_patch16_224` encoder paired with a custom transposed-convolutional decoder built on PyTorch and `timm`.
   * **Function:** Operates directly on the Raspberry Pi. It learns the baseline "perfect" reconstruction pattern of healthy crops. When a leaf anomaly (e.g., blight, pest damage, or nutrient deficiency) occurs, the reconstruction error spikes past our tuned `ANOMALY_THRESHOLD` (0.030), flagging the precise image.
