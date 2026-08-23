@@ -28,14 +28,14 @@
 
 ---
 
-## 🚁 Custom Flight Controller & Cost-Disruptive Hardware
+## 🚁 Custom Flight Controller, Hardware & Hybrid Data Fusion
 
 To make precision agriculture economically viable for smallholder farmers, we engineered a custom, low-cost flight controller and edge-computing stack that drastically undercuts commercial alternatives:
 
 * **Hardware Component Breakdown:** Built using a **Raspberry Pi Zero 2W** (edge computing/controller), **ESP32** (telemetry/communication), **BMP280** (barometric altitude sensor), **NEO-6M** (GPS module), **MPU 6050** (6-axis accelerometer/gyroscope), and **HMC5883L** (digital compass).
 * **Cost Efficiency:** The entire custom hardware stack costs approximately **₹3,999**, making it **93.75% cheaper** than commercial industrial flight controllers like the *Pixhawk Cube Orange* (which retail around ₹64,000).
-* **Hardware-in-the-Loop Dashboard Dependency:** 
-  > *Note on Live Telemetry:* The anomaly status and crop health metrics displayed on the web dashboard update dynamically based on physical execution. If the dashboard is not actively connected to the drone's Raspberry Pi executing the field scan, the dashboard state remains static. Real-time updates and blockchain records are exclusively triggered when the physical hardware completes its mission and syncs its telemetry back to the backend.
+* **Hardware-in-the-Loop & Hybrid Data Fusion:** 
+  > *Telemetry Note:* The platform utilizes a dual-layered intelligence pipeline. When the dashboard is accessed without active physical flight, crop anomalies and health metrics are evaluated and marked solely on the basis of high-resolution **satellite telemetry (Google Earth Engine / Sentinel-2)**. However, when the custom drone hardware is connected and deployed in action, its onboard edge-AI anomaly detection fuses seamlessly with the satellite data—delivering the absolute highest level of spatial accuracy, micro-patch verification, and immutable blockchain logging.
 
 ---
 
