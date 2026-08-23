@@ -1,5 +1,4 @@
-// Vriddhi 2.0 - Unified Dynamic Authentication Engine (HTML/CSS/JS)
-// Mirroring the gorgeous glassmorphism layout of modern-stunning-sign-in
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Inject the Auth Modal HTML into the DOM dynamically
