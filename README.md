@@ -15,18 +15,18 @@
 
 ## 🚀 Overview
 
-**Vriddhi 2.0** is an end-to-end agricultural technology platform designed to bridge the gap between smallholder farming and high-value climate finance. **[Access the Live Platform Here](https://vriddhi2-0.onrender.com/)** to test the interactive dashboard, map telemetry, and verification flows. By integrating satellite telemetry, custom-built autonomous hardware, local edge-artificial intelligence, and a lightweight tamper-proof cryptographic ledger, Vriddhi 2.0 automates farm monitoring, precise micro-interventions, and verifiable environmental reporting.
+**Vriddhi 2.0** is an end-to-end agricultural technology platform designed to bridge the gap between smallholder farming and high-value climate finance. **[Access the Live Platform Here](https://vriddhi2-0.onrender.com/)** to test the interactive dashboard, map telemetry, and verification flows. By integrating satellite telemetry, custom-built autonomous hardware, local edge-artificial intelligence, a lightweight tamper-proof cryptographic ledger, and localized voice guidance, Vriddhi 2.0 automates farm monitoring, precise micro-interventions, and verifiable environmental reporting.
 
 ---
 
 ## ⚙️ How It Works: The Workflow Architecture
 
-1. **Field Selection & Satellite Telemetry (Landing & Map Pages):**
-   Farmers select their field area of interest on an interactive web map. These coordinates interface directly with **Google Earth Engine (GEE)** to extract multi-spectral Sentinel-2 data, instantly computing baseline environmental indices like **NDVI** (vegetation health/greenness), **NDWI** (surface water content), and **NDMI** (moisture stress).
+1. **Field Selection, Satellite Telemetry & Regional Walkthrough (Landing & Map Pages):**
+   Farmers interact with an intuitive landing page where platform steps are visually detailed and reinforced with an integrated **Assamese voice note guide** (designed to bridge the digital literacy gap for local farming communities, with a complete roadmap for all major Indian regional languages). Selected field coordinates interface directly with **Google Earth Engine (GEE)** to extract multi-spectral Sentinel-2 data, instantly computing baseline environmental indices like **NDVI** (vegetation health/greenness), **NDWI** (surface water content), and **NDMI** (moisture stress).
 2. **Autonomous Drone Flight & Edge Scanning:**
    Upon receiving a launch signal and target coordinates from the web backend (`app.py`), the Raspberry Pi-powered drone executes a localized flight mission, hovering to capture high-resolution RGB/NIR imagery using onboard cameras.
 3. **Local Edge-AI Processing:**
-   Captured imagery passes through our custom **Multi model self-supervised reconstruction based anomaly detection system** running directly on. The model evaluates reconstruction error to instantly filter pristine foliage from stressed or diseased crops.
+   Captured imagery passes through our custom **Multi model self-supervised reconstruction based anomaly detection system** running directly on the edge node. The model evaluates reconstruction error to instantly filter pristine foliage from stressed or diseased crops.
 4. **Precision Spot-Spraying:**
    Instead of blanket-spraying chemicals across the entire field, the system isolates exact GPS coordinates of detected anomalies, reducing agrochemical usage by up to 40%.
 5. **Cryptographic Blockchain Logging:**
@@ -49,7 +49,7 @@ To make precision agriculture economically viable for smallholder farmers, we en
 
 Vriddhi 2.0 leverages a hybrid AI pipeline combining edge computing with cloud intelligence:
 
-* **Local Edge Model: **Multi model self-supervised reconstruction based anomaly detection system****
+* **Local Edge Model:** **Multi model self-supervised reconstruction based anomaly detection system**
   * **Dataset & Scale:** Rigorously trained from scratch on a massive dataset of **12,500 healthy plant images**, allowing it to universally recognize pristine foliage across diverse crop species with zero false-positive bias.
   * **Architecture:** Built using a `vit_tiny_patch16_224` encoder paired with a custom transposed-convolutional decoder built on PyTorch and `timm`.
   * **Function:** Operates directly on the Raspberry Pi. It learns the baseline "perfect" reconstruction pattern of healthy crops. When a leaf anomaly (e.g., blight, pest damage, or nutrient deficiency) occurs, the reconstruction error spikes past our tuned `ANOMALY_THRESHOLD` (0.030), flagging the precise image.
